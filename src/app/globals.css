@@ -1,0 +1,17 @@
+/*
+  Importa todos os estilos base (preflight) e utilitários do Tailwind CSS.
+*/
+@import "tailwindcss";
+
+/* 
+  Las variables de color globales (ej. :root { --background: ... }) han sido eliminadas.
+  Toda la gestión de colores y temas se centraliza en tailwind.config.ts
+  para garantizar una única fuente de verdad y evitar conflictos.
+*/
+
+/* Clase global para desabilitar selección y menu de contexto */
+.no-copy {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Padrão */
+}
