@@ -1,21 +1,20 @@
-// RUTA: next.config.ts
+// next.config.ts
 import type { NextConfig } from "next";
 
 /**
  * @description Configuración principal de Next.js.
- * Aquí definimos redireccionamientos globales para la aplicación.
  */
 const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        // Redirigir la raíz del sitio a la campaña por defecto.
         source: "/",
-        destination: "/products/mitolyn/pt-BR",
-        permanent: true, // Es una redirección permanente (SEO-friendly).
+        destination: "/campaigns/mitolyn", // Apunta a la nueva ruta de campaña
+        permanent: true,
       },
     ];
   },
 };
 
 export default nextConfig;
-// RUTA: next.config.ts

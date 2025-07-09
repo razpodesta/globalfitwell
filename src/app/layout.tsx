@@ -1,17 +1,16 @@
 // RUTA: src/app/layout.tsx
+/**
+ * @file Layout Raíz de la Aplicación
+ * @description Layout principal que envuelve toda la aplicación. Define la estructura
+ * HTML base y carga las fuentes globales.
+ *
+ * @TODOS: Mantener estos comentarios de documentación en futuros snapshots.
+ */
 import type { Metadata } from "next";
 import { Roboto_Condensed } from "next/font/google";
 import "./globals.css";
-import { AntiCopyHandler } from "@/app/(components)/layout/AntiCopyHandler";
-import { RouteTester } from "@/app/(components)/ui/RouteTester";
+import { AntiCopyHandler } from "@/components/HOCs/AntiCopyHandler";
 
-/**
- * @file Layout Raíz de la Aplicación
- * @description Este es el único layout que contiene las etiquetas <html> y <body>.
- * Es responsable de cargar las fuentes globales, los estilos base y componentes
- * que deben persistir en absolutamente toda la aplicación, como el AntiCopyHandler.
- * Es agnóstico al contenido específico de las páginas.
- */
 const roboto_condensed = Roboto_Condensed({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -19,8 +18,8 @@ const roboto_condensed = Roboto_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Mitolyn Oficial",
-  description: "Análise completa e informações sobre o produto.",
+  title: "GlobalFitWell",
+  description: "Your partner in wellness.",
 };
 
 export default function RootLayout({
@@ -29,12 +28,15 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={roboto_condensed.variable}>
       <body className="font-sans antialiased text-brand-text-dark bg-brand-bg-white">
-        <AntiCopyHandler>
-          {process.env.NODE_ENV === "development" && <RouteTester />}
-          {children}
-        </AntiCopyHandler>
+        <AntiCopyHandler>{children}</AntiCopyHandler>
       </body>
     </html>
   );
 }
+
+// --- MEJORAS FUTURAS ---
+// 1. **Proveedor de Tema (Theming)**: Implementar `ThemeProvider` para modo oscuro.
+// 2. **Proveedor de i18n**: Implementar `next-intl` para gestión avanzada de idiomas.
+// 3. **Banner de Cookies**: Añadir componente para consentimiento GDPR/LGPD.
+
 // RUTA: src/app/layout.tsx
