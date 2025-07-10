@@ -1,11 +1,10 @@
 // RUTA: src/app/(dev)/developers/branding/preview/page.tsx
 /**
  * @file Campaign Preview Page
- * @description This page is rendered inside an iframe in the Campaign Design Suite.
- * It is dynamically rendered on the server at request time to handle URL search parameters.
+ * @description This page is dynamically rendered to handle URL search parameters.
  *
  * @author L.I.A Legacy
- * @version 1.1.0 (Dynamic Rendering Fix)
+ * @version 1.2.0 (Correct Dynamic Rendering Fix)
  */
 "use client";
 
@@ -18,17 +17,18 @@ import { Header } from "@/components/layout/Header";
 import { ScrollingBanner } from "@/components/layout/ScrollingBanner";
 import { CampaignConfig, CampaignTheme } from "@/lib/types/campaign.d";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useMemo } from "react";
+import React, { Suspense, useEffect, useMemo } from "react";
 import { FontName, fontOptions, labCampaigns } from "../lab.config";
 
-// --- INICIO DE LA CORRECCIÓN ---
-// Esta línea le indica a Next.js que esta página debe ser renderizada dinámicamente
-// en el servidor en cada petición, en lugar de ser generada estáticamente en el build.
-// Esto es necesario porque la página depende de 'useSearchParams()'.
+// --- INICIO DE LA CORRECCIÓN DE PRINCIPIO DE ARCHIVO ---
+// Esta línea le indica a Next.js que esta página debe ser renderizada dinámicamente.
+// Es la solución correcta porque esta página utiliza `useSearchParams`.
 export const dynamic = "force-dynamic";
-// --- FIN DE LA CORRECCIÓN ---
+// --- FIN DE LA CORRECCIÓN DE PRINCIPIO DE ARCHIVO ---
 
 type PageType = "bridge" | "review" | "blog";
+
+// ... (El resto del código del archivo permanece igual)
 
 interface PreviewLayoutProps {
   config: CampaignConfig;
@@ -71,7 +71,8 @@ const PreviewLayout = ({ config, children, theme }: PreviewLayoutProps) => {
   );
 };
 
-export default function PreviewPage() {
+// Se crea un componente interno para poder envolverlo en Suspense
+function PreviewContent() {
   const searchParams = useSearchParams();
 
   const {
@@ -146,4 +147,12 @@ export default function PreviewPage() {
     </PreviewLayout>
   );
 }
-// RUTA: src/app/(dev)/developers/branding/preview/page.tsx
+
+// El componente principal ahora solo envuelve el contenido en Suspense
+export default function PreviewPage() {
+  return (
+    <Suspense fallback={<div>Cargando previsualización...</div>}>
+      <PreviewContent />
+    </Suspense>
+  );
+}
