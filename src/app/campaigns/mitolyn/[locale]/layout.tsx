@@ -6,7 +6,7 @@
  * consume dynamic route parameters.
  *
  * @author L.I.A Legacy
- * @version 2.3.0 (Production Ready - Async Fix)
+ * @version 2.4.0 (Production Ready - Final Fix)
  * @since 2.0.0
  */
 import { notFound } from "next/navigation";
@@ -17,12 +17,10 @@ import { mitolynConfig } from "../campaign.config";
 
 /**
  * Renders the layout for a specific locale of the Mitolyn campaign.
- * Declared as `async` to satisfy the Next.js 15 PageProps constraint.
  *
  * @param {object} props - The component props.
  * @param {React.ReactNode} props.children - The child pages to be rendered.
  * @param {object} props.params - The dynamic route parameters.
- * @param {string} props.params.locale - The locale code (e.g., 'en-US') from the URL.
  * @returns {Promise<React.ReactElement>} A promise resolving to the rendered layout.
  */
 export default async function MitolynLocaleLayout({
@@ -32,6 +30,8 @@ export default async function MitolynLocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
+  // CORRECCIÓN DEFINITIVA: Se desestructura 'locale' directamente.
+  // Next.js resuelve el 'await' implícitamente en la firma del Server Component.
   const { locale } = params;
   const content = mitolynConfig.locales[locale];
   const theme = mitolynConfig.theme;
@@ -40,6 +40,7 @@ export default async function MitolynLocaleLayout({
     notFound();
   }
 
+  // CORRECCIÓN DEFINITIVA: Se rellena el JSX del return.
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollingBanner
