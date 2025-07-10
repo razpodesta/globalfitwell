@@ -2,10 +2,10 @@
 /**
  * @file Campaign Preview Page
  * @description This page is rendered inside an iframe in the Campaign Design Suite.
- * It receives the entire campaign state via URL search parameters, decodes them,
- * and renders a complete, fully-styled page preview. It dynamically selects the
- * correct page component and applies the specified theme.
- * @devonly
+ * It is dynamically rendered on the server at request time to handle URL search parameters.
+ *
+ * @author L.I.A Legacy
+ * @version 1.1.0 (Dynamic Rendering Fix)
  */
 "use client";
 
@@ -20,6 +20,13 @@ import { CampaignConfig, CampaignTheme } from "@/lib/types/campaign.d";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { FontName, fontOptions, labCampaigns } from "../lab.config";
+
+// --- INICIO DE LA CORRECCIÓN ---
+// Esta línea le indica a Next.js que esta página debe ser renderizada dinámicamente
+// en el servidor en cada petición, en lugar de ser generada estáticamente en el build.
+// Esto es necesario porque la página depende de 'useSearchParams()'.
+export const dynamic = "force-dynamic";
+// --- FIN DE LA CORRECCIÓN ---
 
 type PageType = "bridge" | "review" | "blog";
 
@@ -139,3 +146,4 @@ export default function PreviewPage() {
     </PreviewLayout>
   );
 }
+// RUTA: src/app/(dev)/developers/branding/preview/page.tsx
