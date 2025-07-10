@@ -16,7 +16,8 @@ import {
 
 /**
  * @description A placeholder for the review page content.
- * This ensures type safety for locales where the review page is not yet translated.
+ * This ensures type safety for locales where the review page is not yet translated,
+ * preventing build errors by providing a valid, empty structure.
  */
 const emptyReviewPage: LocaleContent["reviewPage"] = {
   intro: {
@@ -37,7 +38,8 @@ const emptyReviewPage: LocaleContent["reviewPage"] = {
 
 /**
  * @description Base content in English (US). This object is used as a template
- * and is spread into other locale configurations to minimize repetition.
+ * and is spread into other locale configurations to minimize repetition and
+ * ensure a consistent structure.
  */
 const en_US_Content: LocaleContent = {
   metadata: {
@@ -46,7 +48,7 @@ const en_US_Content: LocaleContent = {
       "Feeling frustrated trying to lose weight? Discover a science-backed way to kickstart your metabolism.",
   },
   assets: {
-    authorPhoto: "/campaigns/mitolyn/en-US/images/author-photo.jpg",
+    authorPhoto: "/campaigns/mitolyn/brand/author-photo.jpg", // Asumiendo una estructura de marca centralizada
     carouselThumbnails: [
       {
         src: "/campaigns/mitolyn/thumbnails/thumb-1.png",
@@ -131,7 +133,7 @@ const en_US_Content: LocaleContent = {
 
 export const mitolynConfig: CampaignConfig = {
   name: "mitolyn",
-  affiliateUrl: process.env.NEXT_PUBLIC_MITOLYN_AFFILIATE_URL || "/#",
+  affiliateUrl: `/api/go/mitolyn`,
   theme: {
     colors: {
       headerBg: "#0d40b8",
@@ -167,7 +169,6 @@ export const mitolynConfig: CampaignConfig = {
           ],
         },
       },
-      // CORRECCIÓN: Se incluye el objeto bridgePage completo con traducciones
       bridgePage: {
         hero: {
           title: "Totalement frustré(e) d'essayer de perdre du poids ?",
@@ -224,12 +225,11 @@ export const mitolynConfig: CampaignConfig = {
           ],
         },
       },
-      // CORRECCIÓN: Se incluye el objeto bridgePage completo con traducciones
       bridgePage: {
         hero: {
           title: "Sentindo-se Totalmente Frustrado Tentando Perder Peso?",
           subtitle:
-            "Dietas complicadas e treinos brutais simplesmente não estão funcionando?",
+            "Dietas complicadas e treinos brutais simplemente não estão funcionando?",
         },
         thumbSection: {
           altText: "Uma solução simples para resultados reais",

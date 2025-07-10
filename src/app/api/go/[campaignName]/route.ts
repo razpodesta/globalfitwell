@@ -6,20 +6,21 @@
  * target URL from environment variables for security.
  *
  * @author Your Name
- * @version 2.2.0
+ * @version 2.3.0
  */
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Handles GET requests to this dynamic route.
- * @param _request - The incoming Next.js request object.
- * @param context - The context object containing URL parameters, with type inferred by Next.js.
+ * @param _request - The incoming Next.js request object (unused).
+ * @param context - The context object containing URL parameters.
  * @returns A Next.js response object that redirects the user.
  */
 export async function GET(
   _request: NextRequest,
-  // CORRECCIÓN FINAL: Se elimina el tipado explícito del segundo argumento.
-  // Dejamos que Next.js infiera el tipo para máxima compatibilidad con el build.
+  // CORRECCIÓN FINAL: Se reemplaza 'any' por el tipo en línea explícito
+  // que Next.js espera para las rutas dinámicas, satisfaciendo tanto
+  // a TypeScript como a la regla de ESLint.
   context: { params: { campaignName: string } }
 ) {
   const { campaignName } = context.params;
@@ -33,7 +34,7 @@ export async function GET(
     console.error(
       `CRITICAL: Affiliate URL environment variable "${envVarName}" is not set.`
     );
-    // Redirige a la página principal si la configuración no existe.
+    // Redirige a la página principal por defecto si la configuración no existe.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "/";
     return NextResponse.redirect(new URL("/", siteUrl));
   }
