@@ -1,10 +1,11 @@
 // RUTA: src/app/(dev)/developers/branding/preview/page.tsx
 /**
  * @file Campaign Preview Page
- * @description This page is dynamically rendered to handle URL search parameters.
+ * @description This page is dynamically rendered and wrapped in Suspense
+ * to handle URL search parameters correctly during build.
  *
  * @author L.I.A Legacy
- * @version 1.2.0 (Correct Dynamic Rendering Fix)
+ * @version 1.3.0 (Final Build Fix)
  */
 "use client";
 
@@ -20,15 +21,9 @@ import { useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useMemo } from "react";
 import { FontName, fontOptions, labCampaigns } from "../lab.config";
 
-// --- INICIO DE LA CORRECCIÓN DE PRINCIPIO DE ARCHIVO ---
-// Esta línea le indica a Next.js que esta página debe ser renderizada dinámicamente.
-// Es la solución correcta porque esta página utiliza `useSearchParams`.
 export const dynamic = "force-dynamic";
-// --- FIN DE LA CORRECCIÓN DE PRINCIPIO DE ARCHIVO ---
 
 type PageType = "bridge" | "review" | "blog";
-
-// ... (El resto del código del archivo permanece igual)
 
 interface PreviewLayoutProps {
   config: CampaignConfig;
@@ -71,7 +66,6 @@ const PreviewLayout = ({ config, children, theme }: PreviewLayoutProps) => {
   );
 };
 
-// Se crea un componente interno para poder envolverlo en Suspense
 function PreviewContent() {
   const searchParams = useSearchParams();
 
@@ -89,7 +83,6 @@ function PreviewContent() {
     const pageType = (params.get("pageType") as PageType) || "bridge";
     const font = (params.get("font") as FontName) || "Roboto Condensed";
     const fontSize = Number(params.get("fontSize")) || 16;
-
     const baseConfig = JSON.parse(JSON.stringify(labCampaigns[campaign]));
     const dynamicTheme = baseConfig.theme;
     const locale = Object.keys(baseConfig.locales)[0] || "en-US";
@@ -105,12 +98,10 @@ function PreviewContent() {
         ...JSON.parse(params.get("themeColors")!),
       };
     }
-
     const pageProps = {
       content: localeContent,
       affiliateUrl: baseConfig.affiliateUrl,
     };
-
     const pageComponentMapping: Record<
       PageType,
       React.ComponentType<MitolynBridgePageProps>
@@ -121,7 +112,6 @@ function PreviewContent() {
         <div className="p-8 text-center">Blog Preview (Work in Progress)</div>
       ),
     };
-
     return {
       PageToPreview: pageComponentMapping[pageType],
       pageProps: { ...pageProps },
@@ -140,7 +130,6 @@ function PreviewContent() {
   if (!PageToPreview) {
     return <div>Loading Preview...</div>;
   }
-
   return (
     <PreviewLayout config={config} theme={dynamicTheme}>
       <PageToPreview {...pageProps} />
@@ -148,7 +137,6 @@ function PreviewContent() {
   );
 }
 
-// El componente principal ahora solo envuelve el contenido en Suspense
 export default function PreviewPage() {
   return (
     <Suspense fallback={<div>Cargando previsualización...</div>}>
@@ -156,3 +144,4 @@ export default function PreviewPage() {
     </Suspense>
   );
 }
+// RUTA: src/app/(dev)/developers/branding/preview/page.tsx
