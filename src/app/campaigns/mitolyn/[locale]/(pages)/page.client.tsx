@@ -6,7 +6,7 @@
  * designed to be driven entirely by the content object it receives as a prop.
  *
  * @author Your Name
- * @version 2.1.0
+ * @version 2.2.0
  */
 "use client";
 

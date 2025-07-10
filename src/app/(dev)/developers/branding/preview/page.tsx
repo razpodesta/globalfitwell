@@ -9,15 +9,17 @@
  */
 "use client";
 
-import React, { useMemo, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import MitolynBridgePage from "@/app/campaigns/mitolyn/[locale]/(pages)/page";
-import MitolynReviewPage from "@/app/campaigns/mitolyn/[locale]/(pages)/review/page";
-import { labCampaigns, fontOptions, FontName } from "../lab.config";
-import { CampaignConfig, CampaignTheme } from "@/lib/types/campaign.d";
-import { ScrollingBanner } from "@/components/layout/ScrollingBanner";
-import { Header } from "@/components/layout/Header";
+import MitolynBridgePageClient, {
+  type MitolynBridgePageProps,
+} from "@/app/campaigns/mitolyn/[locale]/(pages)/page.client";
+import MitolynReviewPageClient from "@/app/campaigns/mitolyn/[locale]/(pages)/review/page.client";
 import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { ScrollingBanner } from "@/components/layout/ScrollingBanner";
+import { CampaignConfig, CampaignTheme } from "@/lib/types/campaign.d";
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useMemo } from "react";
+import { FontName, fontOptions, labCampaigns } from "../lab.config";
 
 type PageType = "bridge" | "review" | "blog";
 
@@ -26,11 +28,6 @@ interface PreviewLayoutProps {
   children: React.ReactNode;
   theme: CampaignTheme;
 }
-
-// Define un tipo base para las props de las páginas que se pueden previsualizar
-type PreviewablePageProps = {
-  params: { locale: string };
-};
 
 const PreviewLayout = ({ config, children, theme }: PreviewLayoutProps) => {
   const locale = Object.keys(config.locales)[0] || "en-US";
@@ -76,7 +73,7 @@ export default function PreviewPage() {
     fontClass,
     fontSize,
     dynamicTheme,
-    config, // Necesitamos pasar el config al layout
+    config,
   } = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
     const campaign =
@@ -101,15 +98,17 @@ export default function PreviewPage() {
       };
     }
 
-    const pageProps = { params: { locale } };
+    const pageProps = {
+      content: localeContent,
+      affiliateUrl: baseConfig.affiliateUrl,
+    };
 
-    // CORRECCIÓN: Se utiliza un tipo de props explícito en lugar de 'any'
     const pageComponentMapping: Record<
       PageType,
-      React.ComponentType<PreviewablePageProps>
+      React.ComponentType<MitolynBridgePageProps>
     > = {
-      bridge: MitolynBridgePage,
-      review: MitolynReviewPage,
+      bridge: MitolynBridgePageClient,
+      review: MitolynReviewPageClient,
       blog: () => (
         <div className="p-8 text-center">Blog Preview (Work in Progress)</div>
       ),
@@ -117,11 +116,11 @@ export default function PreviewPage() {
 
     return {
       PageToPreview: pageComponentMapping[pageType],
-      pageProps,
+      pageProps: { ...pageProps },
       fontClass: fontOptions[font]?.className || "",
       fontSize,
       dynamicTheme,
-      config: baseConfig, // Devolvemos el config para usarlo en el layout
+      config: baseConfig,
     };
   }, [searchParams]);
 
@@ -134,7 +133,6 @@ export default function PreviewPage() {
     return <div>Loading Preview...</div>;
   }
 
-  // CORRECCIÓN: Pasamos el objeto 'config' correcto al PreviewLayout
   return (
     <PreviewLayout config={config} theme={dynamicTheme}>
       <PageToPreview {...pageProps} />
