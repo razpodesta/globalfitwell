@@ -1,11 +1,12 @@
 // RUTA: src/app/campaigns/mitolyn/[locale]/(pages)/page.tsx
 /**
  * @file Server Component Entry Point for Mitolyn Bridge Page
- * @description This file handles metadata generation and data fetching, adopting
- * Next.js 15 patterns for handling dynamic route parameters.
+ * @description Handles metadata generation and data fetching, adopting the
+ * required `async` signature for Next.js 15 functions that
+ * consume dynamic route parameters.
  *
  * @author L.I.A Legacy
- * @version 2.3.0 (Production Ready)
+ * @version 2.4.0 (Production Ready - Async Fix)
  * @since 2.1.0
  */
 import type { Metadata } from "next";
@@ -25,6 +26,8 @@ export async function generateStaticParams() {
 
 /**
  * Generates dynamic metadata for the page based on the current locale.
+ * Declared as `async` to satisfy Next.js 15 type constraints.
+ *
  * @param {object} props - The props containing the dynamic route parameters.
  * @param {object} props.params - The dynamic route parameters.
  * @param {string} props.params.locale - The locale code from the URL.
@@ -42,12 +45,14 @@ export async function generateMetadata({
 
 /**
  * The main server component for the bridge page.
+ * Declared as `async` to satisfy the Next.js 15 PageProps constraint.
+ *
  * @param {object} props - The props containing the dynamic route parameters.
  * @param {object} props.params - The dynamic route parameters.
  * @param {string} props.params.locale - The locale code from the URL.
- * @returns {React.ReactElement} The rendered client component with props.
+ * @returns {Promise<React.ReactElement>} A promise resolving to the rendered client component.
  */
-export default function MitolynLocaleBridgePage({
+export default async function MitolynLocaleBridgePage({
   params,
 }: {
   params: { locale: string };

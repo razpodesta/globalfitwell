@@ -1,11 +1,12 @@
 // RUTA: src/app/campaigns/mitolyn/[locale]/layout.tsx
 /**
  * @file Dynamic Layout for the Mitolyn Campaign
- * @description This layout wraps all pages for a specific locale within the Mitolyn
- * campaign, following Next.js 15 patterns for accessing dynamic route parameters.
+ * @description This layout wraps all pages for a specific locale, adopting the
+ * required `async` signature for Next.js 15 Server Components that
+ * consume dynamic route parameters.
  *
  * @author L.I.A Legacy
- * @version 2.2.0 (Production Ready)
+ * @version 2.3.0 (Production Ready - Async Fix)
  * @since 2.0.0
  */
 import { notFound } from "next/navigation";
@@ -16,21 +17,21 @@ import { mitolynConfig } from "../campaign.config";
 
 /**
  * Renders the layout for a specific locale of the Mitolyn campaign.
+ * Declared as `async` to satisfy the Next.js 15 PageProps constraint.
  *
  * @param {object} props - The component props.
  * @param {React.ReactNode} props.children - The child pages to be rendered.
  * @param {object} props.params - The dynamic route parameters.
  * @param {string} props.params.locale - The locale code (e.g., 'en-US') from the URL.
- * @returns {React.ReactElement} The rendered layout component.
+ * @returns {Promise<React.ReactElement>} A promise resolving to the rendered layout.
  */
-export default function MitolynLocaleLayout({
+export default async function MitolynLocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  // Correctly access the 'locale' parameter inside the function body.
   const { locale } = params;
   const content = mitolynConfig.locales[locale];
   const theme = mitolynConfig.theme;
