@@ -1,19 +1,9 @@
 // RUTA: src/app/sitemap.ts
-/**
- * @file Generador de Sitemap Dinámico
- * @description Crea el sitemap.xml dinámicamente basado en las campañas definidas en sus
- * archivos de configuración modulares. Está diseñado para ser simple y escalable.
- *
- * @TODOS: Mantener estos comentarios de documentación en futuros snapshots.
- */
 import { MetadataRoute } from "next";
-import { mitolynConfig } from "./campaigns/mitolyn/config"; // Importa la config de Mitolyn
+import { mitolynConfig } from "./campaigns/mitolyn/campaign.config"; // RUTA CORREGIDA
 
-// --- Registro Central de Campañas ---
-// A medida que crees nuevas campañas, importa su config y añádela a este objeto.
 const allCampaignConfigs = {
   mitolyn: mitolynConfig,
-  // "super-serum": superSerumConfig, // Futura campaña
 };
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1,12 +1,9 @@
-// src/app/api/go/[campaignName]/route.ts
+// RUTA: src/app/api/go/[campaignName]/route.ts
+import { mitolynConfig } from "@/app/campaigns/mitolyn/campaign.config"; // RUTA CORREGIDA
 import { NextResponse, type NextRequest } from "next/server";
-import { mitolynConfig } from "@/app/campaigns/mitolyn/config"; // Importa configs específicas
 
-// Mapeo de nombres de campaña a sus configuraciones
-// A medida que añadas campañas, impórtalas y añádelas aquí.
 const campaignConfigs: Record<string, { affiliateUrl: string }> = {
   mitolyn: mitolynConfig,
-  // "super-serum": superSerumConfig, // Ejemplo para una futura campaña
 };
 
 export async function GET(

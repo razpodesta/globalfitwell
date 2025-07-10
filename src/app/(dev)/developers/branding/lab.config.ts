@@ -9,7 +9,7 @@
  * En caso de modificar completamente este archivo, estas secciones de documentación deben
  * ser preservadas, implementadas y mejoradas, respetando siempre los avances ya realizados.
  */
-import { mitolynConfig } from "@/app/campaigns/mitolyn/config";
+import { mitolynConfig } from "@/app/campaigns/mitolyn/campaign.config"; // RUTA CORREGIDA
 import { type CampaignConfig } from "@/lib/types/campaign.d";
 import { Inter, Lato, Montserrat, Roboto_Condensed } from "next/font/google";
 

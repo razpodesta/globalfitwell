@@ -1,101 +1,143 @@
 // RUTA: src/app/(dev)/developers/branding/preview/page.tsx
 /**
- * @file Página de Previsualización para la Suite de Diseño.
- * @description Esta página está diseñada para ser renderizada DENTRO de un <iframe> en el
- * laboratorio principal. Recibe el estado del diseño a través de parámetros de búsqueda
- * en la URL, lo decodifica y renderiza el componente de página correspondiente con props dinámicos.
+ * @file Campaign Preview Page
+ * @description This page is rendered inside an iframe in the Campaign Design Suite.
+ * It receives the entire campaign state via URL search parameters, decodes them,
+ * and renders a complete, fully-styled page preview. It dynamically selects the
+ * correct page component and applies the specified theme.
  * @devonly
- *
- * @TODOS: Mantener estos comentarios de documentación en futuros snapshots.
- * En caso de modificar completamente este archivo, estas secciones de documentación deben
- * ser preservadas, implementadas y mejoradas, respetando siempre los avances ya realizados.
  */
-import MitolynBridgePageClient, {
-  MitolynBridgePageProps,
-} from "@/app/campaigns/mitolyn/(pages)/page.client";
-import MitolynReviewPage from "@/app/campaigns/mitolyn/(pages)/review/page";
+"use client";
+
+import React, { useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import MitolynBridgePage from "@/app/campaigns/mitolyn/[locale]/(pages)/page";
+import MitolynReviewPage from "@/app/campaigns/mitolyn/[locale]/(pages)/review/page";
 import { labCampaigns, fontOptions, FontName } from "../lab.config";
-import { LocaleContent } from "@/lib/types/campaign.d";
+import { CampaignConfig, CampaignTheme } from "@/lib/types/campaign.d";
+import { ScrollingBanner } from "@/components/layout/ScrollingBanner";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 type PageType = "bridge" | "review" | "blog";
 
-// --- Lógica de Decodificación del Estado ---
-const decodeStateForPreview = (searchParams: {
-  [key: string]: string | string[] | undefined;
-}) => {
-  const campaign =
-    (searchParams.campaign as keyof typeof labCampaigns) || "mitolyn";
-  const pageType = (searchParams.pageType as PageType) || "bridge";
-  const font = (searchParams.font as FontName) || "Roboto Condensed";
-
-  const config = labCampaigns[campaign];
-  const localeContent = config.locales["pt-BR"];
-  const dynamicContent: LocaleContent = JSON.parse(
-    JSON.stringify(localeContent)
-  );
-
-  if (searchParams.heroTitle)
-    dynamicContent.bridgePage.hero.title = searchParams.heroTitle as string;
-  if (searchParams.heroSubtitle)
-    dynamicContent.bridgePage.hero.subtitle =
-      searchParams.heroSubtitle as string;
-  if (searchParams.ctaButtonText)
-    dynamicContent.bridgePage.thumbSection.ctaButtonText =
-      searchParams.ctaButtonText as string;
-
-  const pageProps = {
-    config: { ...config, locales: { "pt-BR": dynamicContent } },
-  };
-
-  const pageComponentMapping: Record<
-    PageType,
-    React.ComponentType<MitolynBridgePageProps>
-  > = {
-    bridge: MitolynBridgePageClient,
-    review: MitolynReviewPage,
-    blog: () => (
-      <div className="p-8 text-center bg-white h-full flex items-center justify-center">
-        Vista Previa del Blog en Desarrollo...
-      </div>
-    ),
-  };
-
-  const fontClass = fontOptions[font]?.className || "";
-
-  return {
-    pageComponent: pageComponentMapping[pageType],
-    pageProps,
-    fontClass,
-  };
-};
-
-// --- Componente de Página ---
-export default function PreviewPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  const {
-    pageComponent: PageToPreview,
-    pageProps,
-    fontClass,
-  } = decodeStateForPreview(searchParams);
-
-  return (
-    <html className={fontClass}>
-      <body className="font-sans">
-        <PageToPreview {...pageProps} />
-      </body>
-    </html>
-  );
+interface PreviewLayoutProps {
+  config: CampaignConfig;
+  children: React.ReactNode;
+  theme: CampaignTheme;
 }
 
-// --- MEJORAS FUTURAS ---
-// 1. **Soporte Multi-Idioma**: La lógica de `decodeStateForPreview` actualmente fuerza "pt-BR".
-//    Debería ser capaz de recibir un parámetro `locale` en la URL para cargar dinámicamente
-//    el contenido del idioma correcto desde la configuración de la campaña.
-// 2. **Renderizado de Secciones Dinámicas**: Para que la preview de la "Review Page" sea editable,
-//    esta página necesitaría recibir y aplicar más parámetros de la URL (ej. título de la sección
-//    de ingredientes, contenido de las FAQs, etc.).
+// Define un tipo base para las props de las páginas que se pueden previsualizar
+type PreviewablePageProps = {
+  params: { locale: string };
+};
 
-// RUTA: src/app/(dev)/developers/branding/preview/page.tsx
+const PreviewLayout = ({ config, children, theme }: PreviewLayoutProps) => {
+  const locale = Object.keys(config.locales)[0] || "en-US";
+  const content = config.locales[locale];
+
+  if (!content) return null;
+  const { layout } = content;
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <ScrollingBanner
+        message={layout.scrollingBannerText}
+        style={{ background: theme.colors.scrollingBannerBg }}
+      />
+      <header
+        className="sticky top-0 z-50 shadow-lg"
+        style={{ backgroundColor: theme.colors.headerBg }}
+      >
+        <Header
+          logoUrl={layout.header.logoUrl}
+          ctaText={layout.header.ctaText}
+          affiliateUrl={config.affiliateUrl}
+        />
+      </header>
+      <main className="flex-grow bg-brand-bg-white">{children}</main>
+      <footer style={{ backgroundColor: theme.colors.footerBg }}>
+        <Footer
+          {...layout.footer}
+          ctaText={layout.header.ctaText}
+          affiliateUrl={config.affiliateUrl}
+        />
+      </footer>
+    </div>
+  );
+};
+
+export default function PreviewPage() {
+  const searchParams = useSearchParams();
+
+  const {
+    PageToPreview,
+    pageProps,
+    fontClass,
+    fontSize,
+    dynamicTheme,
+    config, // Necesitamos pasar el config al layout
+  } = useMemo(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const campaign =
+      (params.get("campaign") as keyof typeof labCampaigns) || "mitolyn";
+    const pageType = (params.get("pageType") as PageType) || "bridge";
+    const font = (params.get("font") as FontName) || "Roboto Condensed";
+    const fontSize = Number(params.get("fontSize")) || 16;
+
+    const baseConfig = JSON.parse(JSON.stringify(labCampaigns[campaign]));
+    const dynamicTheme = baseConfig.theme;
+    const locale = Object.keys(baseConfig.locales)[0] || "en-US";
+    const localeContent = baseConfig.locales[locale];
+
+    if (params.get("heroTitle"))
+      localeContent.bridgePage.hero.title = params.get("heroTitle");
+    if (params.get("heroSubtitle"))
+      localeContent.bridgePage.hero.subtitle = params.get("heroSubtitle");
+    if (params.get("themeColors")) {
+      dynamicTheme.colors = {
+        ...dynamicTheme.colors,
+        ...JSON.parse(params.get("themeColors")!),
+      };
+    }
+
+    const pageProps = { params: { locale } };
+
+    // CORRECCIÓN: Se utiliza un tipo de props explícito en lugar de 'any'
+    const pageComponentMapping: Record<
+      PageType,
+      React.ComponentType<PreviewablePageProps>
+    > = {
+      bridge: MitolynBridgePage,
+      review: MitolynReviewPage,
+      blog: () => (
+        <div className="p-8 text-center">Blog Preview (Work in Progress)</div>
+      ),
+    };
+
+    return {
+      PageToPreview: pageComponentMapping[pageType],
+      pageProps,
+      fontClass: fontOptions[font]?.className || "",
+      fontSize,
+      dynamicTheme,
+      config: baseConfig, // Devolvemos el config para usarlo en el layout
+    };
+  }, [searchParams]);
+
+  useEffect(() => {
+    document.body.className = `font-sans ${fontClass}`;
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontClass, fontSize]);
+
+  if (!PageToPreview) {
+    return <div>Loading Preview...</div>;
+  }
+
+  // CORRECCIÓN: Pasamos el objeto 'config' correcto al PreviewLayout
+  return (
+    <PreviewLayout config={config} theme={dynamicTheme}>
+      <PageToPreview {...pageProps} />
+    </PreviewLayout>
+  );
+}

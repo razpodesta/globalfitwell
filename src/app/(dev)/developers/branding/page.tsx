@@ -1,20 +1,98 @@
 // RUTA: src/app/(dev)/developers/branding/page.tsx
-/**
- * @file Página Principal del Laboratorio Visual de Branding (Orquestador).
- * @description Punto de entrada para la suite de diseño. Orquesta el hook de lógica,
- * la UI del panel de control y el canvas de previsualización con el iframe.
- * @devonly
- *
- * @TODOS: Mantener estos comentarios de documentación en futuros snapshots.
- * En caso de modificar completamente este archivo, estas secciones de documentación deben
- * ser preservadas, implementadas y mejoradas, respetando siempre los avances ya realizados.
- */
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useRef, useEffect } from "react";
 import { useLabEngine, Viewport } from "./useLabEngine";
-import { LabHeader, LabFooter, ControlPanel } from "./components";
+import { ControlPanel } from "./components";
 import { fontOptions } from "./lab.config";
+import { Share2, TestTube, Monitor, Tablet, Smartphone } from "lucide-react";
+import { RouteMenu } from "@/components/dev/RouteTester";
+import { LabState } from "./useLabEngine";
+
+// --- Interfaces para los componentes locales ---
+interface LabHeaderProps {
+  onShare: () => void;
+  viewport: Viewport;
+  onViewportChange: (v: Viewport) => void;
+}
+
+// --- Componentes Locales del Layout del Laboratorio ---
+const LabHeader = ({ onShare, onViewportChange, viewport }: LabHeaderProps) => {
+  const [isRouteMenuOpen, setRouteMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node))
+        setRouteMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <header className="bg-gray-800 text-white p-2 shadow-md z-30 flex justify-between items-center h-16 shrink-0">
+      <h1 className="text-lg font-bold ml-4">Campaign Design Suite</h1>
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 p-1 bg-gray-700 rounded-lg">
+        <button
+          onClick={() => onViewportChange("desktop")}
+          className={`p-2 rounded-md transition-colors ${
+            viewport === "desktop" ? "bg-indigo-500" : "hover:bg-gray-600"
+          }`}
+          title="Desktop View"
+        >
+          <Monitor size={18} />
+        </button>
+        <button
+          onClick={() => onViewportChange("tablet")}
+          className={`p-2 rounded-md transition-colors ${
+            viewport === "tablet" ? "bg-indigo-500" : "hover:bg-gray-600"
+          }`}
+          title="Tablet View"
+        >
+          <Tablet size={18} />
+        </button>
+        <button
+          onClick={() => onViewportChange("mobile")}
+          className={`p-2 rounded-md transition-colors ${
+            viewport === "mobile" ? "bg-indigo-500" : "hover:bg-gray-600"
+          }`}
+          title="Mobile View"
+        >
+          <Smartphone size={18} />
+        </button>
+      </div>
+      <div className="flex items-center gap-3 mr-4">
+        <span className="text-xs font-semibold opacity-75">
+          Powered by MetaShark
+        </span>
+        <div ref={menuRef} className="relative">
+          <button
+            onClick={() => setRouteMenuOpen((o) => !o)}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+          >
+            <TestTube size={16} /> DEV ROUTES
+          </button>
+          {isRouteMenuOpen && (
+            <RouteMenu onNavigate={() => setRouteMenuOpen(false)} />
+          )}
+        </div>
+        <button
+          onClick={onShare}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs bg-indigo-500 hover:bg-indigo-600 rounded-md transition-colors"
+        >
+          <Share2 size={16} /> Compartir
+        </button>
+      </div>
+    </header>
+  );
+};
+
+const LabFooter = () => (
+  <footer className="bg-gray-200 text-gray-500 p-2 text-center text-xs z-20 border-t h-8 shrink-0">
+    © {new Date().getFullYear()} Entorno de Desarrollo. No para uso en
+    producción.
+  </footer>
+);
 
 const viewportClasses: Record<Viewport, string> = {
   desktop: "w-full max-w-[1400px]",
@@ -29,6 +107,7 @@ function BrandingLab() {
     setViewport,
     previewUrl,
     handleStateChange,
+    handleColorChange,
     handleShare,
     generateConfigCode,
   } = useLabEngine();
@@ -43,11 +122,11 @@ function BrandingLab() {
       />
       <div className="flex flex-1 overflow-hidden">
         <ControlPanel
-          state={state}
+          state={state as LabState}
           onStateChange={handleStateChange}
+          onColorChange={handleColorChange}
           onExport={generateConfigCode}
         />
-
         <main className="flex-1 flex items-center justify-center p-4 overflow-hidden bg-gray-700/50">
           <div
             className={`relative bg-white rounded-lg shadow-2xl transition-all duration-300 ease-in-out ${viewportClasses[viewport]}`}
@@ -85,12 +164,4 @@ export default function BrandingPage() {
     </Suspense>
   );
 }
-
-// --- MEJORAS FUTURAS ---
-// 1. **Renderizado Condicional de Controles**: El panel de control (`ControlPanel`) podría
-//    ser más inteligente, mostrando campos de edición diferentes basados en el `state.pageType`
-//    (ej. controles para la sección de "Ingredientes" solo si se selecciona la "Review Page").
-// 2. **Comunicación Iframe <-> Panel**: Implementar `window.postMessage` para permitir que, por ejemplo,
-//    un clic en un elemento dentro de la preview resalte el control correspondiente en el panel.
-
 // RUTA: src/app/(dev)/developers/branding/page.tsx

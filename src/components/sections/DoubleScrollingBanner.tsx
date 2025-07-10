@@ -1,4 +1,4 @@
-// RUTA: src/app/(components)/sections/DoubleScrollingBanner.tsx
+// RUTA: src/components/sections/DoubleScrollingBanner.tsx
 "use client";
 
 import Image from "next/image";
@@ -7,21 +7,19 @@ import { Star } from "lucide-react";
 
 // --- Interfaces para la estructura de datos ---
 
-/** Datos para cada item de testimonio en el banner superior */
 interface TestimonialItem {
   imageSrc: string;
   altText: string;
   name: string;
-  rating: number; // Un número del 1 al 5
+  rating: number;
 }
 
-/** Datos para cada item de logo en el banner inferior */
-interface LogoItem {
+// CORRECCIÓN: Se exporta la interfaz para que pueda ser usada externamente.
+export interface LogoItem {
   imageSrc: string;
   altText: string;
 }
 
-/** Props que el componente principal espera recibir */
 export interface DoubleScrollingBannerProps {
   testimonials: TestimonialItem[];
   logos: LogoItem[];
@@ -76,7 +74,6 @@ export function DoubleScrollingBanner({
 }: DoubleScrollingBannerProps) {
   return (
     <section className="w-full bg-brand-almost-white py-12 overflow-x-hidden">
-      {/* Fila superior: Testimonios (Derecha a Izquierda) */}
       <Marquee
         direction="left"
         speed={40}
@@ -88,11 +85,7 @@ export function DoubleScrollingBanner({
           <TestimonialCard key={testimonial.name} {...testimonial} />
         ))}
       </Marquee>
-
-      {/* Espacio separador entre las dos filas */}
       <div className="h-8" />
-
-      {/* Fila inferior: Logos (Izquierda a Derecha para contraste visual) */}
       <Marquee
         direction="right"
         speed={30}
@@ -118,4 +111,4 @@ export function DoubleScrollingBanner({
     </section>
   );
 }
-// RUTA: src/app/(components)/sections/DoubleScrollingBanner.tsx
+// RUTA: src/components/sections/DoubleScrollingBanner.tsx
