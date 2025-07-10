@@ -1,23 +1,22 @@
 // RUTA: src/app/(dev)/developers/branding/page.tsx
 /**
  * @file Campaign Design Suite Main Page
- * @description Main entry point for the branding lab. This is the main UI
- * for the developer tooling, hosting the control panel and the preview iframe.
+ * @description Main entry point for the branding lab. Its visibility in production
+ * is controlled by the NEXT_PUBLIC_ENABLE_DEV_SUITE_IN_PROD environment variable.
  *
  * @author L.I.A Legacy
- * @version 1.2.0 (Final Code Restoration)
+ * @version 1.3.0 (Feature Flag Implementation)
  */
 "use client";
 
-import React, { Suspense, useState, useRef, useEffect } from "react";
-import { useLabEngine, Viewport } from "./useLabEngine";
+import { RouteMenu } from "@/components/dev/RouteTester";
+import { Monitor, Share2, Smartphone, Tablet, TestTube } from "lucide-react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ControlPanel } from "./components";
 import { fontOptions } from "./lab.config";
-import { Share2, TestTube, Monitor, Tablet, Smartphone } from "lucide-react";
-import { RouteMenu } from "@/components/dev/RouteTester";
-import { LabState } from "./useLabEngine";
+import { LabState, useLabEngine, Viewport } from "./useLabEngine";
 
-// --- INICIO DE LA CORRECCIÓN: Se restauran las definiciones de componentes locales ---
+// --- Definiciones de Componentes Locales (LabHeader, LabFooter) sin cambios ---
 interface LabHeaderProps {
   onShare: () => void;
   viewport: Viewport;
@@ -100,7 +99,7 @@ const LabFooter = () => (
     producción.
   </footer>
 );
-// --- FIN DE LA CORRECCIÓN ---
+// --- Fin de Definiciones de Componentes Locales ---
 
 const viewportClasses: Record<Viewport, string> = {
   desktop: "w-full max-w-[1400px]",
@@ -159,7 +158,18 @@ function BrandingLab() {
 }
 
 export default function BrandingPage() {
-  if (process.env.NODE_ENV !== "development") return null;
+  // --- INICIO DE LA MODIFICACIÓN ---
+  // La visibilidad de la suite ahora se controla por una variable de entorno.
+  // Esto permite activarla en producción para demostraciones o colaboradores externos.
+  const isDevSuiteEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_DEV_SUITE_IN_PROD === "true";
+
+  // La suite solo se muestra si estamos en desarrollo O si la bandera está explícitamente activada.
+  if (process.env.NODE_ENV === "production" && !isDevSuiteEnabled) {
+    return null;
+  }
+  // --- FIN DE LA MODIFICACIÓN ---
+
   return (
     <Suspense
       fallback={
