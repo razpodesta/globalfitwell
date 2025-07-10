@@ -1,42 +1,20 @@
 // RUTA: src/app/campaigns/mitolyn/[locale]/layout.tsx
-/**
- * @file Dynamic Layout for the Mitolyn Campaign
- * @description Final version using explicit await on params to ensure
- * compatibility with all Next.js 15 environments.
- *
- * @author L.I.A Legacy
- * @version 2.5.0 (Final Await Fix)
- * @since 2.0.0
- */
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ScrollingBanner } from "@/components/layout/ScrollingBanner";
 import { mitolynConfig } from "../campaign.config";
 
-/**
- * Renders the layout for a specific locale of the Mitolyn campaign.
- * @param {object} props The component props.
- * @returns {Promise<React.ReactElement>} A promise resolving to the rendered layout.
- */
-export default async function MitolynLocaleLayout({
+export default function MitolynLocaleLayout({
   children,
-  params,
+  params: { locale },
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  // CORRECCIÓN FINAL: Se usa 'await' explícitamente sobre el objeto params.
-  const awaitedParams = await params;
-  const { locale } = awaitedParams;
-
   const content = mitolynConfig.locales[locale];
   const theme = mitolynConfig.theme;
-
-  if (!content) {
-    notFound();
-  }
-
+  if (!content) notFound();
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollingBanner
@@ -64,4 +42,3 @@ export default async function MitolynLocaleLayout({
     </div>
   );
 }
-// RUTA: src/app/campaigns/mitolyn/[locale]/layout.tsx
