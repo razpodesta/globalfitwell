@@ -5,22 +5,31 @@
  * affiliate link based on the campaign name in the URL. It fetches the
  * target URL from environment variables for security.
  *
- * @author Your Name
- * @version 2.3.0
+ * @author L.I.A Legacy
+ * @version 2.3.1
+ * @since 2.3.0
  */
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Handles GET requests to this dynamic route.
- * @param _request - The incoming Next.js request object (unused).
- * @param context - The context object containing URL parameters.
- * @returns A Next.js response object that redirects the user.
+ * Handles GET requests to this dynamic route. It infers the type for the
+ * `context` parameter directly from Next.js's route handler signature to
+ * ensure build-time type compatibility.
+ *
+ * @param {NextRequest} _request - The incoming Next.js request object (unused).
+ * @param {object} context - The context object containing URL parameters.
+ * @param {object} context.params - The dynamic route parameters.
+ * @param {string} context.params.campaignName - The name of the campaign extracted from the URL.
+ * @returns {Promise<NextResponse>} A Next.js response object that redirects the user.
+ * @throws Will not throw an error, but will log a critical error to the console if the environment variable is missing and redirect to the homepage.
+ * @example
+ * ```
+ * // A GET request to /api/go/mitolyn
+ * // will trigger this function with context.params.campaignName = "mitolyn"
+ * ```
  */
 export async function GET(
   _request: NextRequest,
-  // CORRECCIÓN FINAL: Se reemplaza 'any' por el tipo en línea explícito
-  // que Next.js espera para las rutas dinámicas, satisfaciendo tanto
-  // a TypeScript como a la regla de ESLint.
   context: { params: { campaignName: string } }
 ) {
   const { campaignName } = context.params;
@@ -39,6 +48,8 @@ export async function GET(
     return NextResponse.redirect(new URL("/", siteUrl));
   }
 
-  // 2. Redirección 307 (Temporal)
+  // 2. Redirección 307 (Temporal) para mantener el método de la petición.
+  // Es la mejor práctica para redirecciones de "cloaking".
   return NextResponse.redirect(new URL(affiliateUrl), 307);
 }
+// RUTA: src/app/api/go/[campaignName]/route.ts
