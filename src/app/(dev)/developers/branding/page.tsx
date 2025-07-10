@@ -1,13 +1,21 @@
 // RUTA: src/app/(dev)/developers/branding/page.tsx
+/**
+ * @file Campaign Design Suite Main Page
+ * @description Main entry point for the branding lab. Wraps the core `BrandingLab`
+ * component in a React Suspense boundary to handle dynamic data fetching from
+ * URL search parameters, resolving the prerender error.
+ *
+ * @author L.I.A Legacy
+ * @version 1.1.0 (Suspense Fix)
+ */
 "use client";
 
-import React, { Suspense, useState, useRef, useEffect } from "react";
-import { useLabEngine, Viewport } from "./useLabEngine";
+import { RouteMenu } from "@/components/dev/RouteTester";
+import { Monitor, Share2, Smartphone, Tablet, TestTube } from "lucide-react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ControlPanel } from "./components";
 import { fontOptions } from "./lab.config";
-import { Share2, TestTube, Monitor, Tablet, Smartphone } from "lucide-react";
-import { RouteMenu } from "@/components/dev/RouteTester";
-import { LabState } from "./useLabEngine";
+import { LabState, useLabEngine, Viewport } from "./useLabEngine";
 
 // --- Interfaces para los componentes locales ---
 interface LabHeaderProps {
@@ -150,18 +158,28 @@ function BrandingLab() {
   );
 }
 
+// El componente exportado por defecto es ahora el que contiene la lógica de Suspense.
 export default function BrandingPage() {
-  if (process.env.NODE_ENV !== "development") return null;
+  // Guard clause para asegurar que la suite solo esté disponible en desarrollo.
+  if (process.env.NODE_ENV !== "development") {
+    return null;
+  }
+
   return (
+    // --- INICIO DE LA CORRECCIÓN ---
+    // Envolvemos el componente principal de la suite en un Suspense boundary.
+    // Esto es requerido por Next.js para manejar correctamente los hooks como
+    // `useSearchParams` que se utilizan en los componentes hijos.
     <Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center text-lg font-semibold">
+        <div className="flex h-screen items-center justify-center bg-gray-800 text-white text-lg font-semibold">
           Cargando Suite de Diseño...
         </div>
       }
     >
       <BrandingLab />
     </Suspense>
+    // --- FIN DE LA CORRECCIÓN ---
   );
 }
 // RUTA: src/app/(dev)/developers/branding/page.tsx
