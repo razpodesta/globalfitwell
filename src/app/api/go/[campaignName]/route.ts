@@ -2,11 +2,11 @@
 /**
  * @file Dynamic Affiliate Link Redirector (Cloaking)
  * @description This API route handler dynamically redirects users to the correct
- * affiliate link based on the campaign name in the URL. It fetches the
- * target URL from environment variables for security.
+ * affiliate link based on the campaign name in the URL. Includes console
+ * verification for deployment validation.
  *
  * @author L.I.A Legacy
- * @version 2.4.0
+ * @version 2.5.0 (Production Ready with Verification)
  * @since 2.3.0
  */
 import { NextResponse, type NextRequest } from "next/server";
@@ -19,33 +19,36 @@ import { NextResponse, type NextRequest } from "next/server";
  * @param {NextRequest} _request - The incoming Next.js request object (unused).
  * @param {any} context - The context object containing URL parameters. Type is bypassed for build stability.
  * @returns {Promise<NextResponse>} A Next.js response object that redirects the user.
- * @throws Will not throw, but logs a critical error and redirects to the homepage if the environment variable is missing.
- * @example
- * ```
- * // A GET request to /api/go/mitolyn triggers this function
- * // with context.params.campaignName = "mitolyn"
- * ```
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function GET(_request: NextRequest, context: any) {
   const { params } = context;
   const { campaignName } = params;
 
-  // Dynamically construct the environment variable name.
+  // --- INICIO DE VERIFICACIÓN POR CONSOLA (L.I.A. Legacy) ---
+  console.log(
+    `[L.I.A. VERIFICATION] API Route /api/go invoked for campaign: "${campaignName}"`
+  );
+
   const envVarName = `${campaignName.toUpperCase()}_AFFILIATE_URL`;
+  console.log(
+    `[L.I.A. VERIFICATION] Constructed Environment Variable Name: "${envVarName}"`
+  );
+  // --- FIN DE VERIFICACIÓN POR CONSOLA ---
+
   const affiliateUrl = process.env[envVarName];
 
-  // 1. Verify if the affiliate URL is configured in the environment variables.
   if (!affiliateUrl) {
     console.error(
-      `CRITICAL: Affiliate URL environment variable "${envVarName}" is not set.`
+      `[CRITICAL FAILURE] Environment Variable "${envVarName}" NOT FOUND. Check Vercel project settings. Redirecting to homepage.`
     );
-    // Redirect to the default homepage if the configuration is missing.
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "/";
     return NextResponse.redirect(new URL("/", siteUrl));
   }
 
-  // 2. Perform a 307 (Temporary) redirect to preserve the original request method.
+  console.log(
+    `[L.I.A. VERIFICATION] SUCCESS: Variable "${envVarName}" matched. Redirecting user.`
+  );
   return NextResponse.redirect(new URL(affiliateUrl), 307);
 }
 // RUTA: src/app/api/go/[campaignName]/route.ts

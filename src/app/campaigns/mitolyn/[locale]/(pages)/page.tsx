@@ -1,13 +1,11 @@
 // RUTA: src/app/campaigns/mitolyn/[locale]/(pages)/page.tsx
 /**
  * @file Server Component Entry Point for Mitolyn Bridge Page
- * @description This file is the main server-side entry point for the route.
- * It handles metadata generation and data fetching, then passes the
- * necessary props to the client component for rendering. Adopts
+ * @description This file handles metadata generation and data fetching, adopting
  * Next.js 15 patterns for handling dynamic route parameters.
  *
  * @author L.I.A Legacy
- * @version 2.2.0
+ * @version 2.3.0 (Production Ready)
  * @since 2.1.0
  */
 import type { Metadata } from "next";
@@ -27,7 +25,7 @@ export async function generateStaticParams() {
 
 /**
  * Generates dynamic metadata for the page based on the current locale.
- * @param {object} props - The component props.
+ * @param {object} props - The props containing the dynamic route parameters.
  * @param {object} props.params - The dynamic route parameters.
  * @param {string} props.params.locale - The locale code from the URL.
  * @returns {Promise<Metadata>} The metadata object for the page.
@@ -37,7 +35,6 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
-  // Correctly access the 'locale' parameter inside the function body.
   const { locale } = params;
   const content = mitolynConfig.locales[locale];
   return content?.metadata || {};
@@ -45,17 +42,16 @@ export async function generateMetadata({
 
 /**
  * The main server component for the bridge page.
- * @param {object} props - The component props.
+ * @param {object} props - The props containing the dynamic route parameters.
  * @param {object} props.params - The dynamic route parameters.
  * @param {string} props.params.locale - The locale code from the URL.
- * @returns {React.ReactElement | null} The rendered client component with props, or null if content not found.
+ * @returns {React.ReactElement} The rendered client component with props.
  */
 export default function MitolynLocaleBridgePage({
   params,
 }: {
   params: { locale: string };
 }) {
-  // Correctly access the 'locale' parameter inside the function body.
   const { locale } = params;
   const content = mitolynConfig.locales[locale];
 
@@ -63,7 +59,6 @@ export default function MitolynLocaleBridgePage({
     notFound();
   }
 
-  // Pass the resolved, server-side content to the client component.
   return (
     <MitolynBridgePageClient
       content={content}
