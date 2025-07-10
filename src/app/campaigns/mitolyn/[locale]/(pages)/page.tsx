@@ -1,11 +1,11 @@
 // RUTA: src/app/campaigns/mitolyn/[locale]/(pages)/page.tsx
 /**
  * @file Server Component Entry Point for Mitolyn Bridge Page
- * @description Handles metadata generation and data fetching, adopting the
- * required `async` signature for Next.js 15 functions.
+ * @description Final version using explicit await on params to ensure
+ * compatibility with all Next.js 15 environments.
  *
  * @author L.I.A Legacy
- * @version 2.5.0 (Production Ready - Final Fix)
+ * @version 2.6.0 (Final Await Fix)
  * @since 2.1.0
  */
 import type { Metadata } from "next";
@@ -21,8 +21,7 @@ export async function generateStaticParams() {
 
 /**
  * Generates dynamic metadata for the page based on the current locale.
- *
- * @param {object} props - The props containing the dynamic route parameters.
+ * @param {object} props The props containing the dynamic route parameters.
  * @returns {Promise<Metadata>} The metadata object for the page.
  */
 export async function generateMetadata({
@@ -30,16 +29,17 @@ export async function generateMetadata({
 }: {
   params: { locale: string };
 }): Promise<Metadata> {
-  // CORRECCIÓN DEFINITIVA: Se desestructura 'locale' directamente.
-  const { locale } = params;
+  // CORRECCIÓN FINAL: Se usa 'await' explícitamente sobre el objeto params.
+  const awaitedParams = await params;
+  const { locale } = awaitedParams;
+
   const content = mitolynConfig.locales[locale];
   return content?.metadata || {};
 }
 
 /**
  * The main server component for the bridge page.
- *
- * @param {object} props - The props containing the dynamic route parameters.
+ * @param {object} props The props containing the dynamic route parameters.
  * @returns {Promise<React.ReactElement>} A promise resolving to the rendered client component.
  */
 export default async function MitolynLocaleBridgePage({
@@ -47,8 +47,10 @@ export default async function MitolynLocaleBridgePage({
 }: {
   params: { locale: string };
 }) {
-  // CORRECCIÓN DEFINITIVA: Se desestructura 'locale' directamente.
-  const { locale } = params;
+  // CORRECCIÓN FINAL: Se usa 'await' explícitamente sobre el objeto params.
+  const awaitedParams = await params;
+  const { locale } = awaitedParams;
+
   const content = mitolynConfig.locales[locale];
 
   if (!content) {
